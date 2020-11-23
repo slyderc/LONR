@@ -11,7 +11,6 @@ class Chat:
 
     def names(self):
         return list(username for username in self._users.keys())
-        # return list(user.username for user in self._users.keys())
 
     async def send(self, message):
         for recipient, client in self._users.items():
@@ -21,7 +20,7 @@ class Chat:
         if not user.can_chat and not user.is_admin:
             return 'You are banned from chat.'
         await self.system_message(f"{user.username} has joined chat")
-        self._users[user.username] = client = ChatClient(self, user, reader, writer)
+        self._users[user.username] = client = ChatClient(self, user, reader, writer, self.term)
         await client.chat()
         self._users.pop(user.username)
         await self.system_message(f"{user.username} has left the room")
@@ -32,12 +31,13 @@ class Chat:
 
 
 class ChatClient:
-    def __init__(self, server, user, reader, writer):
+    def __init__(self, server, user, reader, writer, term):
         self.server = server
         self.user = user
         self.reader = reader
         self.writer = writer
-
+        self.term = term
+        
     async def chat(self):
         prompt = 'chat> '
         self.writer.write(prompt)
