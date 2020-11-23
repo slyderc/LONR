@@ -7,7 +7,8 @@ class Chat:
         self._users = {}
 
     def names(self):
-        return list(user.username for user in self._users.keys())
+        return list(username for username in self._users.keys())
+        # return list(user.username for user in self._users.keys())
 
     async def send(self, message):
         for recipient, client in self._users.items():
@@ -17,14 +18,14 @@ class Chat:
         if not user.can_chat and not user.is_admin:
             return 'You are banned from chat.'
         await self.system_message(f"{user.username} has joined chat")
-        self._users[user.id] = client = ChatClient(self, user, reader, writer)
+        self._users[user.username] = client = ChatClient(self, user, reader, writer)
         await client.chat()
-        self._users.pop(user.id)
+        self._users.pop(user.username)
         await self.system_message(f"{user.username} has left chat")
-        return 'Goodbye.'
+        return "Leaving chat."
 
     async def system_message(self, message):
-        await self.send(f"{Fore.RED}{Style.DIM}*** {message}{Style.RESET_ALL}")
+        await self.send(f"{Fore.RED}*** {message}{Style.RESET_ALL}")
 
 class ChatClient:
     def __init__(self, server, user, reader, writer):
@@ -46,7 +47,7 @@ class ChatClient:
                 break
             elif line.startswith('/me '):
                 _, _, remainder = line.partition(' ')
-                line = f"{Fore.GREEN}{Style.DIM}* {self.user.username} {remainder}{Style.RESET_ALL}"
+                line = f"{Fore.GREEN}* {self.user.username} {remainder}{Style.RESET_ALL}"
             elif line.startswith('/admin '):
                 if self.user.is_admin:
                     _, _, remainder = line.partition(' ')
@@ -54,7 +55,7 @@ class ChatClient:
                 else:
                     await self.print_error("You do not have permission for that command")
                 line = ''
-            elif line.startswith('/names'):
+            elif line.startswith('/who'):
                 names = self.server.names()
                 await self.print_info("Users currently in chat:")
                 for name in names:
@@ -67,7 +68,7 @@ class ChatClient:
             self.writer.write('\r\x1b[2K' + prompt)
 
     async def print_error(self, message):
-        await self.print(f"{Fore.RED}{Style.DIM}!!! {message}{Style.RESET_ALL}")
+        await self.print(f"{Fore.RED}!!! {message}{Style.RESET_ALL}")
 
     async def print_info(self, message):
         await self.print(f"{Fore.BLUE}** {message}{Style.RESET_ALL}")
