@@ -1,0 +1,30 @@
+#!/usr/sbin/nft -f
+flush ruleset
+
+table inet filter {
+    chain INPUT {
+        type filter hook input priority 0; policy drop;
+
+        tcp flags & (fin|syn) == (fin|syn) drop
+        tcp flags & (syn|rst) == (syn|rst) drop
+        tcp flags & (fin|syn|rst|psh|ack|urg) < (fin) drop
+        tcp flags & (fin|syn|rst|psh|ack|urg) == (fin|psh|urg) drop
+        ip frag-off & 8191 != 0 counter packets 0 bytes 0 drop
+
+        iif lo accept comment "localhost traffic"
+
+        ct state established,related accept comment "traffic originated from us"
+
+        ct state invalid counter drop comment "drop invalid packets"
+
+        tcp dport { 22,7777 } ct state new accept
+    }
+
+    chain FORWARD {
+        type filter hook forward priority 0; policy drop;
+    }
+
+    chain OUTPUT {
+        type filter hook output priority 0; policy accept;
+    }
+}

@@ -1,0 +1,15 @@
+[Unit]
+Description=LONR
+After=syslog.target
+After=network.target
+
+[Service]
+User=lonr
+Group=lonr
+WorkingDirectory=/opt/lonr
+ExecStart=/usr/bin/python3 /opt/lonr/lonr.py
+Environment=PATH=/usr/bin:/usr/local/bin
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
