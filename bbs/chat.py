@@ -1,10 +1,12 @@
 import asyncio
 
+from blessed import Terminal
 from colorama import Fore, Back, Style
 
 class Chat:
     def __init__(self):
         self._users = {}
+        self.term = Terminal()
 
     def names(self):
         return list(username for username in self._users.keys())
@@ -21,11 +23,11 @@ class Chat:
         self._users[user.username] = client = ChatClient(self, user, reader, writer)
         await client.chat()
         self._users.pop(user.username)
-        await self.system_message(f"{user.username} has left chat")
+        await self.system_message(f"{user.username} has left the room")
         return "Leaving chat."
 
     async def system_message(self, message):
-        await self.send(f"{Fore.RED}*** {message}{Style.RESET_ALL}")
+        await self.send(f"{self.term.bright_yellow}*** {message}{self.term.normal}")
 
 class ChatClient:
     def __init__(self, server, user, reader, writer):
@@ -77,7 +79,8 @@ class ChatClient:
         await self.server.send(message)
 
     async def print(self, message):
-        self.writer.write(f'\x1b7\n\x1b[1A\x1b[1L{message}\x1b8')
+        self.writer.write(f'\n\x1b[1A\x1b[1L{message}\x1b8')
+        # self.writer.write(f'\x1b7\n\x1b[1A\x1b[1L{message}\x1b8')
 
     async def recv(self, message):
         await self.print(message)
