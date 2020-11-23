@@ -3,6 +3,7 @@ import asyncio
 from blessed import Terminal
 from colorama import Fore, Back, Style
 
+
 class Chat:
     def __init__(self):
         self._users = {}
@@ -29,13 +30,14 @@ class Chat:
     async def system_message(self, message):
         await self.send(f"{self.term.bright_yellow}*** {message}{self.term.normal}")
 
+
 class ChatClient:
     def __init__(self, server, user, reader, writer):
         self.server = server
         self.user = user
         self.reader = reader
         self.writer = writer
-    
+
     async def chat(self):
         prompt = 'chat> '
         self.writer.write(prompt)
@@ -86,7 +88,8 @@ class ChatClient:
         await self.print(message)
 
 
-
 _chat = Chat()
+
+
 def get_chat():
     return _chat
