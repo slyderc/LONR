@@ -1,7 +1,6 @@
 import asyncio
 
 from blessed import Terminal
-from colorama import Fore, Back, Style
 
 
 class Chat:
