@@ -37,7 +37,7 @@ class ChatClient:
         self.reader = reader
         self.writer = writer
         self.term = term
-        
+
     async def chat(self):
         prompt = 'chat> '
         self.writer.write(prompt)
@@ -51,7 +51,7 @@ class ChatClient:
                 break
             elif line.startswith('/me '):
                 _, _, remainder = line.partition(' ')
-                line = f"{Fore.GREEN}* {self.user.username} {remainder}{Style.RESET_ALL}"
+                line = f"{self.term.green}* {self.user.username} {remainder}{self.term.normal}"
             elif line.startswith('/admin '):
                 if self.user.is_admin:
                     _, _, remainder = line.partition(' ')
@@ -72,10 +72,10 @@ class ChatClient:
             self.writer.write('\r\x1b[2K' + prompt)
 
     async def print_error(self, message):
-        await self.print(f"{Fore.RED}!!! {message}{Style.RESET_ALL}")
+        await self.print(f"{self.term.brightred}!!! {message}{self.term.normal}")
 
     async def print_info(self, message):
-        await self.print(f"{Fore.BLUE}** {message}{Style.RESET_ALL}")
+        await self.print(f"{self.term.brightblue}** {message}{self.term.normal}")
 
     async def send(self, message):
         await self.server.send(message)
