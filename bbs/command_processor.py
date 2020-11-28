@@ -8,7 +8,7 @@ class Exit(BaseException):
     pass
 
 class BaseProcessor:
-    def __init__(self, user, reader, writer, prompt='>>> '):
+    def __init__(self, user, reader, writer, prompt='Your choice? [?=Help]: '):
         self._user = user
         self._reader = reader
         self._writer = writer
@@ -37,6 +37,8 @@ class BaseProcessor:
 
     async def dispatch(self, line):
         cmd, args = self.parseline(line)
+        if cmd == '?':
+            cmd = "help"
         func = getattr(self, f'do_{cmd}', self.default)
         return await func(*args)
 

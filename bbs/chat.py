@@ -50,7 +50,7 @@ class ChatClient:
                 break
             elif line.startswith('/me '):
                 _, _, remainder = line.partition(' ')
-                line = f"{self.term.green}* {self.user.username} {remainder}{self.term.normal}"
+                line = f"{self.term.bright_green}* {self.user.username} {remainder}{self.term.normal}"
             elif line.startswith('/admin '):
                 if self.user.is_admin:
                     _, _, remainder = line.partition(' ')
@@ -71,17 +71,16 @@ class ChatClient:
             self.writer.write('\r\x1b[2K' + prompt)
 
     async def print_error(self, message):
-        await self.print(f"{self.term.brightred}!!! {message}{self.term.normal}")
+        await self.print(f"{self.term.bright_red}!!! {message}{self.term.normal}")
 
     async def print_info(self, message):
-        await self.print(f"{self.term.brightblue}** {message}{self.term.normal}")
+        await self.print(f"{self.term.bright_blue}** {message}{self.term.normal}")
 
     async def send(self, message):
         await self.server.send(message)
 
     async def print(self, message):
-        self.writer.write(f'\n\x1b[1A\x1b[1L{message}\x1b8')
-        # self.writer.write(f'\x1b7\n\x1b[1A\x1b[1L{message}\x1b8')
+        self.writer.write(f'\x1b7\n\x1b[1A\x1b[1L{message}\x1b8')
 
     async def recv(self, message):
         await self.print(message)
