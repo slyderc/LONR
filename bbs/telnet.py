@@ -21,6 +21,7 @@ class LONRTelnetServer(TelnetServer):
         self.writer.write('\r\n* poof *\r\n')
         self.writer.close()
 
+
 async def login(reader, writer):
     username = await reader.prompt('username: ')
     user = await bbs.models.User.get_user(username)
@@ -34,6 +35,7 @@ async def login(reader, writer):
     writer.write("\r\nInvalid password.")
     return None
 
+
 async def negotiate_telnet_options(writer):
     """
     Negotiate the telnet connection options with the client.
@@ -45,10 +47,11 @@ async def negotiate_telnet_options(writer):
     writer.iac(telopt.WONT, telopt.LINEMODE)
     rows = writer.get_extra_info('rows', 24)
     cols = writer.get_extra_info('cols', 80)
-    return rows, cols
 
     # Give the client a bit of time to respond to the commands before starting.
     await asyncio.sleep(0.5)
+    return rows, cols
+
 
 async def shell(reader, writer):
     rows, cols = await negotiate_telnet_options(writer)
@@ -67,7 +70,8 @@ async def shell(reader, writer):
     writer.write((await MainProcessor(user, reader, writer).process()) + '\r\n')
     await writer.drain()
     writer.close()
-    
+
+
 async def start_telnet(host='', port=6023, timeout=10):
     return await create_server(
         host=host,
