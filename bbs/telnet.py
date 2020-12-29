@@ -23,7 +23,35 @@ class LONRTelnetServer(TelnetServer):
 
 
 async def login(reader, writer):
+    writer.write("\r\n\r\nWelcome to the Land of No Return!\r\n")
+    writer.write('\r\nState thy name, or enter "new" to register.\r\n')
     username = await reader.prompt('username: ')
+    if username == 'new':
+        new_username = await reader.prompt('\r\n\r\nHow will thy name be known around these parts? [Q=Quit]: ')
+        if new_username.lower() == 'q':
+            return None
+
+        check_user = await bbs.models.User.get_user(new_username)
+        if check_user is not None:
+            writer.write('\r\n*** That name is already in use!\r')
+            return None
+
+        with reader.no_echo():
+            new_password = await reader.prompt('\r\n\r\nEnter a password to use with the guards: ')
+            new_password_check = await reader.prompt('\r\nEnter again to verify: ')
+        if new_password != new_password_check:
+            writer.write('\r\n*** Passwords do not match!\r\n')
+            return None
+        user = await bbs.models.User.new_user(
+            username=new_username,
+            password=new_password,
+            email=f'{new_username}@lonr.hivenoise.com',
+            can_chat=True,
+            is_admin=False,
+        )
+        username = new_username
+        writer.write('\r\nYou have been registered.  Please continue your visit...\r\n')
+
     user = await bbs.models.User.get_user(username)
     if user is None:
         writer.write("\r\nUnknown username.")
@@ -72,7 +100,7 @@ async def shell(reader, writer):
     writer.close()
 
 
-async def start_telnet(host='', port=6023, timeout=10):
+async def start_telnet(host='', port=6023, timeout=300):
     return await create_server(
         host=host,
         port=port,

@@ -4,8 +4,10 @@ from colorama import Fore, Back, Style
 
 from bbs.chat import get_chat
 
+
 class Exit(BaseException):
     pass
+
 
 class BaseProcessor:
     def __init__(self, user, reader, writer, prompt='Your choice? [?=Help]: '):
@@ -83,6 +85,7 @@ class BaseProcessor:
                 break
         return 'Goodbye.'
 
+
 class MainProcessor(BaseProcessor):
     async def do_chat(self, *args):
         """
@@ -95,6 +98,7 @@ class MainProcessor(BaseProcessor):
         Enter admin console
         """
         return await AdminProcessor(self._user, self._reader, self._writer).process()
+
 
 class AdminProcessor(BaseProcessor):
     async def allowed(self):

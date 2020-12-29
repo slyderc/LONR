@@ -51,6 +51,7 @@ class Document(Model):
         await root.save()
         await users.save()
 
+
 class User(Model):
     id = fields.IntField(pk=True)
     username = fields.CharField(max_length=255, unique=True, index=True)
@@ -99,8 +100,9 @@ class User(Model):
     def __str__(self):
         return self.username
 
+
 async def models_init(new=False):
-    db = await Tortoise.init(db_url='sqlite://test.db', modules={'models': [__name__]})
+    db = await Tortoise.init(db_url='sqlite://users.db', modules={'models': [__name__]})
     if new:
         await Tortoise.generate_schemas()
         await Document.create_roots()
@@ -109,17 +111,19 @@ async def models_init(new=False):
             user = await User.new_user(
                 username=username,
                 password='password',
-                email=f'{username}@bbs.sdamon.com',
+                email=f'{username}@lonr.hivenoise.com',
                 can_chat=can_chat,
                 is_admin=is_admin,
             )
     return db
+
 
 async def models_cleanup():
     await Tortoise.close_connections()
 
 if __name__ == '__main__':
     import asyncio
+
     async def newinit():
         try:
             await models_init(True)
